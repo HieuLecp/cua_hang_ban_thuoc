@@ -36,7 +36,7 @@ namespace backend.Controllers
                 data = _data
             }); ;
         }
-        [HttpGet, Authorize]
+        [HttpGet]
 
         public async Task<ActionResult<IEnumerable<Role>>> GetRole(Guid id)
         {
@@ -56,7 +56,7 @@ namespace backend.Controllers
                 data = _data
             }); ;
         }
-        [HttpPost("add"), Authorize]
+        [HttpPost("add")]
 
         public async Task<ActionResult> AddRole([FromBody] Role role)
         {
@@ -78,7 +78,7 @@ namespace backend.Controllers
                 data = role
             });
         }
-        [HttpPut("edit"), Authorize]
+        [HttpPut("edit")]
 
         public async Task<ActionResult> Edit([FromBody] Role role)
         {
@@ -99,7 +99,7 @@ namespace backend.Controllers
                 status = 200
             });
         }
-        [HttpDelete("delete"), Authorize]
+        [HttpDelete("delete")]
 
         public async Task<ActionResult> Delete([FromBody] Guid id)
         {

@@ -7,7 +7,6 @@ namespace Final.Controllers
 {
     [ApiController]
     [Route("api/thongke")]
-    [Authorize]
 
     public class ThongKeController : ControllerBase
     {

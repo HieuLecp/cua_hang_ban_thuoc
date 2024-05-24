@@ -23,7 +23,7 @@ namespace backend.Controllers
             db = _db;
             _config = cf;
         }
-        [HttpGet("all"), Authorize]
+        [HttpGet("all")]
 
         public async Task<ActionResult<IEnumerable<User>>> GetAllUser()
         {
@@ -70,7 +70,7 @@ namespace backend.Controllers
                 data = _data
             }); ;
         }
-        [HttpGet, Authorize]
+        [HttpGet]
 
         public async Task<ActionResult<IEnumerable<User>>> GetUser(Guid id)
         {
@@ -103,7 +103,6 @@ namespace backend.Controllers
                 });
             }
             var role = await db.Roles.Where(x => x.Name.Equals("Guest")).FirstOrDefaultAsync();
-            user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
             if (user.IdRole == null)
             {
                 user.IdRole = role.Id;
@@ -117,7 +116,7 @@ namespace backend.Controllers
                 data = user
             });
         }
-        [HttpPut("edit"), Authorize]
+        [HttpPut("edit")]
 
         public async Task<ActionResult> Edit([FromBody] User user)
         {
@@ -131,18 +130,30 @@ namespace backend.Controllers
                 });
             }
             db.Entry(await db.Users.FirstOrDefaultAsync(x => x.Id == _user.Id)).CurrentValues.SetValues(user);
-            var _data = await db.Users.FindAsync(user.Id);
-            var role = await db.Roles.FindAsync(_data.IdRole);
+            var __user = (from nv in db.Users
+                         where nv.Id == user.Id
+                         select new
+                         {
+                             nv.Id,
+                             nv.Password,
+                             nv.Email,
+                             nv.IdRole,
+                             nv.PathImg,
+                             nv.Address,
+                             nv.Name,
+                             nv.CreateAt,
+                             nv.Phone,
+                             role = db.Roles.Where(x => x.Id == nv.IdRole).FirstOrDefault().Name
+                         }).ToList();
             await db.SaveChangesAsync();
             return Ok(new
             {
                 message = "Sửa thành công!",
                 status = 200,
-                data = _data,
-                role = role.Name
+                data = __user
             });
         }
-        [HttpDelete("delete"), Authorize]
+        [HttpDelete("delete")]
 
         public async Task<ActionResult> Delete([FromBody] Guid id)
         {
@@ -186,7 +197,6 @@ namespace backend.Controllers
         [HttpPost("login")]
         public async Task<ActionResult> Login([FromBody] Login user)
         {
-            string _token = "";
             var _user = (from nv in db.Users
                             where nv.Email == user.email
                             select new
@@ -194,11 +204,13 @@ namespace backend.Controllers
                                 nv.Id,
                                 nv.Password,
                                 nv.Email,
+                                nv.PathImg,
                                 nv.IdRole,
                                 nv.Address,
                                 nv.Name,
                                 nv.CreateAt,
-                                nv.Phone
+                                nv.Phone,
+                                role = db.Roles.Where( x => x.Id == nv.IdRole).FirstOrDefault().Name
                             }).ToList();
             if (_user.Count == 0)
             {
@@ -208,7 +220,7 @@ namespace backend.Controllers
                     status = 404
                 });
             }
-            if (!BCrypt.Net.BCrypt.Verify(user.password, _user[0].Password))
+            if (user.password != _user[0].Password)
             {
                 return Ok(new
                 {
@@ -216,25 +228,11 @@ namespace backend.Controllers
                     status = 400
                 });
             }
-            var role = await db.Roles.FindAsync(_user[0].IdRole);
-            try
-            {
-                _token = TokenHelper.Instance.CreateToken(_user[0].Email, role.Name, _config);
-            }
-            catch (Exception ex)
-            {
-                return Ok(new
-                {
-                    message = "Thiếu dữ liệu",
-                    status = 404
-                });
-            }
             return Ok(new
             {
                 message = "Thành công",
                 status = 200,
                 data = _user,
-                token = _token
             });
         }
         [HttpGet("info")]
@@ -277,7 +275,7 @@ namespace backend.Controllers
                 role = role.Name
             });
         }
-        [HttpPost("changepass"), Authorize]
+        [HttpPost("changepass")]
         public ActionResult ChangePassword([FromBody] ChangePassword changePassword)
         {
             var user = db.Users.Find(changePassword.idUser);
@@ -289,7 +287,7 @@ namespace backend.Controllers
                     status = 200
                 });
             }
-            if (!BCrypt.Net.BCrypt.Verify(changePassword.oldPassword, user.Password))
+            if (changePassword.oldPassword != user.Password)
             {
                 return Ok(new
                 {
@@ -297,7 +295,6 @@ namespace backend.Controllers
                     status = 400
                 });
             }
-            user.Password = BCrypt.Net.BCrypt.HashPassword(changePassword.newPassword);
             db.Entry(db.Users.FirstOrDefault(x => x.Id == user.Id)).CurrentValues.SetValues(user);
             db.SaveChanges();
             return Ok(new

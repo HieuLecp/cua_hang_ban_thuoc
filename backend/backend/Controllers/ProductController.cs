@@ -51,7 +51,6 @@ namespace backend.Controllers
             }); ;
         }
         [HttpGet]
-
         public async Task<ActionResult<IEnumerable<Product>>> GetProduct(Guid id)
         {
             if (db.Products == null)
@@ -81,7 +80,6 @@ namespace backend.Controllers
             });
         }
         [HttpPost("add")]
-        //[Authorize]
         public async Task<ActionResult> AddProduct([FromBody] Product product)
         {
             await db.Products.AddAsync(product);
@@ -93,7 +91,7 @@ namespace backend.Controllers
                 data = product
             });
         }
-        [HttpPut("edit"), Authorize]
+        [HttpPut("edit")]
 
         public async Task<ActionResult> Edit([FromBody] Product product)
         {
@@ -114,7 +112,7 @@ namespace backend.Controllers
                 status = 200
             });
         }
-        [HttpDelete("delete"), Authorize]
+        [HttpDelete("delete")]
 
         public async Task<ActionResult> Delete([FromBody] Guid id)
         {

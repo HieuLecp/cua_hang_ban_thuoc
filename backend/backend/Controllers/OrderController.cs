@@ -46,7 +46,7 @@ namespace backend.Controllers
                 data = _data
             }); ;
         }
-        [HttpGet, Authorize]
+        [HttpGet]
 
         public async Task<ActionResult<IEnumerable<Order>>> GetOrder(Guid id)
         {
@@ -66,7 +66,7 @@ namespace backend.Controllers
                 data = _data
             }); ;
         }
-        [HttpPut("edit"), Authorize]
+        [HttpPut("edit")]
 
         public async Task<ActionResult> Edit([FromBody] Order order)
         {
@@ -87,7 +87,7 @@ namespace backend.Controllers
                 status = 200
             });
         }
-        [HttpPost("add"), Authorize]
+        [HttpPost("add")]
 
         public async Task<ActionResult> AddOrder([FromBody] Order order)
         {
@@ -101,7 +101,7 @@ namespace backend.Controllers
                 data = _data
             });
         }
-        [HttpDelete("delete"), Authorize]
+        [HttpDelete("delete")]
 
         public async Task<ActionResult> Delete([FromBody] Guid id)
         {
@@ -143,7 +143,7 @@ namespace backend.Controllers
             }
         }
 
-        [HttpGet("getOrderNotPay"), Authorize]
+        [HttpGet("getOrderNotPay")]
 
         public async Task<ActionResult<Order>> GetOrderNotPayment(Guid idUser)
         {
@@ -173,7 +173,7 @@ namespace backend.Controllers
                 total = amount
             });
         }
-        [HttpGet("confirm"), Authorize]
+        [HttpGet("confirm")]
 
         public async Task<ActionResult> Confirm(Guid idUser, int status, int type)
         {
@@ -196,7 +196,7 @@ namespace backend.Controllers
                 }
             }
             _order.CreateAt = DateTime.Now;
-            _order.Total = amount + (decimal) (type == 1 ? 30000 : 0);
+            _order.Total = amount;
             _order.Status = status;
             db.Entry(await db.Orders.FirstOrDefaultAsync(x => x.Id == _order.Id)).CurrentValues.SetValues(_order);
             await db.SaveChangesAsync();
@@ -206,7 +206,7 @@ namespace backend.Controllers
                 status = 200
             });
         }
-        [HttpGet("getAllOrder"), Authorize]
+        [HttpGet("getAllOrder")]
 
         public async Task<ActionResult<IEnumerable<Order>>> GetAllOrderByIdUser(Guid idUser)
         {
@@ -218,7 +218,7 @@ namespace backend.Controllers
                     status = 404
                 });
             }
-            var _data = await db.Orders.Where(x => x.IdUser == idUser).OrderByDescending(x => x.CreateAt).ToListAsync();
+            var _data = await db.Orders.Where(x => x.IdUser == idUser).Where(x => x.Total != 0).OrderByDescending(x => x.CreateAt).ToListAsync();
             return Ok(new
             {
                 message = "Lấy dữ liệu thành công!",
@@ -226,7 +226,7 @@ namespace backend.Controllers
                 data = _data
             }); ;
         }
-        [HttpGet("confirmOrder"), Authorize]
+        [HttpGet("confirmOrder")]
 
         public async Task<ActionResult> ConfirmOrder(Guid idOrder, int status)
         {

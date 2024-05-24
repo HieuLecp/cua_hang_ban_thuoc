@@ -33,7 +33,7 @@ namespace backend.Controllers
                 data = _data
             }); ;
         }
-        [HttpGet, Authorize]
+        [HttpGet]
 
         public async Task<ActionResult<IEnumerable<Detailorder>>> GetDetailOrder(Guid id)
         {
@@ -53,7 +53,7 @@ namespace backend.Controllers
                 data = _data
             }); ;
         }
-        [HttpPost("add"), Authorize]
+        [HttpPost("add")]
 
         public async Task<ActionResult> AddDetail([FromBody] Detailorder detail)
         {
@@ -76,7 +76,7 @@ namespace backend.Controllers
                 data = detail
             });
         }
-        [HttpPut("edit"), Authorize]
+        [HttpPut("edit")]
 
         public async Task<ActionResult> Edit([FromBody] Detailorder detail)
         {
@@ -97,7 +97,7 @@ namespace backend.Controllers
                 status = 200
             });
         }
-        [HttpDelete("delete"), Authorize]
+        [HttpDelete("delete")]
 
         public async Task<ActionResult> Delete([FromBody] Guid id)
         {
@@ -139,7 +139,7 @@ namespace backend.Controllers
             }
         }
 
-        [HttpGet("getAllByOrder"), Authorize]
+        [HttpGet("getAllByOrder")]
 
         public async Task<ActionResult<IEnumerable<Detailorder>>> GetAllByOrder(Guid idOrder)
         {

@@ -33,7 +33,7 @@ namespace backend.Controllers
                 data = _data
             }); ;
         }
-        [HttpGet, Authorize]
+        [HttpGet]
         public async Task<ActionResult<IEnumerable<Category>>> GetCategory(Guid id)
         {
             if (db.Categories == null)
@@ -53,7 +53,6 @@ namespace backend.Controllers
             }); ;
         }
         [HttpPost("add")]
-        //[Authorize]
         public async Task<ActionResult> AddCategory([FromBody] Category category)
         {
             var _category = await db.Categories.Where(x=>x.Slug.Equals(category.Slug)).ToListAsync();
@@ -74,7 +73,7 @@ namespace backend.Controllers
                 data = category
             });
         }
-        [HttpPut("edit"), Authorize]
+        [HttpPut("edit")]
 
         public async Task<ActionResult> Edit([FromBody]Category category)
         {
@@ -95,7 +94,7 @@ namespace backend.Controllers
                 status = 200
             });
         }
-        [HttpDelete("delete"), Authorize]
+        [HttpDelete("delete")]
 
         public async Task<ActionResult> Delete([FromBody] Guid id)
         {
